@@ -3,19 +3,21 @@ import requests
 import urllib
 import json
 import logging
+from googletrans import Translator
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 config = 'config.json'
-base_url = 'https://translate.yandex.net/api/v1.5/tr.json/'
+#base_url = 'https://translate.yandex.net/api/v1.5/tr.json/'
 lang_all = {}
 with open(config, 'r', encoding='utf-8') as c:
     conf = json.load(c)
     token = conf['access_token']
-    key = conf['key']
+    #key = conf['key']
 
 bot = BotHandler(token)
+translator = Translator()
 
 
 def url_encode(txt):
@@ -75,31 +77,22 @@ def main():
             else:
                 lang = 'ru'
             if text is not None:
-                text = url_encode(text)
-                url_lang = ''.join([base_url, 'detect', '?key={}'.format(key), '&text={}'.format(text), '&hint=ru,en'])
-                response = requests.get(url_lang)
-                ret = response.json()
-                if ret['code'] == 200:
-                    lang_detect = ret['lang']
-                    if lang_detect == 'ru':
-                        lang = 'en'
-                    if lang_detect == 'en':
-                        lang = 'ru'
-                    url = ''.join(
-                        [base_url, 'translate', '?key={}'.format(key), '&text={}'.format(text), '&lang={}'.format(lang),
-                         '&format=plain'])
-                    response = requests.get(url)
-                    ret = response.json()
-                    translate = ret['text'][0]
-                    len_sym = len(translate)
+                #text = url_encode(text)
+                #print(text)
+                lang_detect = translator.detect(text).lang
+                print(lang_detect)
+                if lang_detect == 'ru':
+                    lang = 'en'
+                if lang_detect == 'en':
+                    lang = 'ru'
+                translate = translator.translate(text=text, dest=lang).text
+                len_sym = len(translate)
+                if len_sym != 0:
                     res_len += len_sym
                     logger.info('chat_id: {}, len symbols: {}, result {}'.format(chat_id, len_sym, res_len))
-                    if res_len >> 10000000: # контроль в логах количества переведенных символов
-                        res_len == 0
-
-                    bot.send_message('{}\n_____\nПереведено сервисом «Яндекс.Переводчик»'.format(translate), chat_id)
+                    bot.send_message(translate, chat_id)
                 else:
-                    bot.send_message('Перевод невозможен', chat_id)
+                    bot.send_message('Перевод не возможен\nTranslation not available', chat_id)
 
 
 if __name__ == '__main__':
