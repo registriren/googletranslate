@@ -74,7 +74,11 @@ def main():
             else:
                 lang = 'ru'
             if text is not None:
-                lang_detect = translator.detect(text).lang
+                try:
+                    lang_detect = translator.detect(text).lang
+                except Exception as e:
+                    logger.error("Error: %s.", e)
+                    lang_detect = 'en'
                 if lang_detect == 'ru':
                     lang = 'en'
                 if lang_detect == 'en':
