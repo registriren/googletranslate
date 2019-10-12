@@ -89,7 +89,7 @@ def main():
                 len_sym = len(translate)
                 if len_sym != 0:
                     res_len += len_sym
-                    logger.info('chat_id: {}, len symbols: {}, result {}'.format(chat_id, len_sym, res_len))
+                    logger.info('chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym, res_len))
                     bot.send_message(translate, chat_id)
                 else:
                     bot.send_message('Перевод не возможен\nTranslation not available', chat_id)
