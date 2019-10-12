@@ -83,7 +83,11 @@ def main():
                     lang = 'en'
                 if lang_detect == 'en':
                     lang = 'ru'
-                translate = translator.translate(text=text, dest=lang).text
+                try:
+                    translate = translator.translate(text=text, dest=lang).text
+                except Exception as e:
+                    logger.error("Error: %s.", e)
+                    translate = None
                 len_sym = len(translate)
                 if len_sym != 0:
                     res_len += len_sym
