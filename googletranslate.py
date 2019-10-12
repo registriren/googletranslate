@@ -1,5 +1,4 @@
 from botapitamtam import BotHandler
-import requests
 import urllib
 import json
 import logging
@@ -56,9 +55,7 @@ def main():
                 bot.send_message('Текст будет переводиться на English', chat_id)
                 text = None
             if payload is not None:
-                print(lang_all)
                 lang_all.update({chat_id: payload})
-                print(lang_all)
                 lang = lang_all.get(chat_id)
                 text = None
                 if lang == 'ru':
@@ -77,10 +74,7 @@ def main():
             else:
                 lang = 'ru'
             if text is not None:
-                #text = url_encode(text)
-                #print(text)
                 lang_detect = translator.detect(text).lang
-                print(lang_detect)
                 if lang_detect == 'ru':
                     lang = 'en'
                 if lang_detect == 'en':
