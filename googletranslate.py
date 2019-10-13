@@ -44,7 +44,7 @@ def main():
                             {"type": 'callback',
                              "text": 'English',
                              "payload": 'en'}]]
-                bot.send_buttons('Направление перевода', buttons, chat_id)  # вызываем две кнопки с одним описанием
+                bot.send_buttons('Направление перевода\nTranslation direction', buttons, chat_id)  # вызываем две кнопки с одним описанием
                 text = None
             if text == '/lang ru':
                 lang_all.update({chat_id: 'ru'})
@@ -52,7 +52,7 @@ def main():
                 text = None
             if text == '/lang en':
                 lang_all.update({chat_id: 'en'})
-                bot.send_message('Текст будет переводиться на English', chat_id)
+                bot.send_message('Text will be translated into English', chat_id)
                 text = None
             if payload is not None:
                 lang_all.update({chat_id: payload})
@@ -61,10 +61,10 @@ def main():
                 if lang == 'ru':
                     bot.send_message('______\nТекст будет переводиться на Русский', chat_id)
                 else:
-                    bot.send_message('______\nТекст будет переводиться на English', chat_id)
+                    bot.send_message('______\nText will be translated into English', chat_id)
             if type_upd == 'bot_started':
                 bot.send_message(
-                    'Отправте или перешлите боту текст. Язык переводимого текста определяется автоматически. '
+                    'Отправьте или перешлите боту текст. Язык переводимого текста определяется автоматически. '
                     'Перевод по умолчанию на русский. Для изменения направления перевода используйте команду /lang',
                     chat_id)
                 lang_all.update({chat_id: 'ru'})
@@ -94,7 +94,7 @@ def main():
                     logger.info('chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym, res_len))
                     bot.send_message(translate, chat_id)
                 else:
-                    bot.send_message('Перевод не возможен\nTranslation not available', chat_id)
+                    bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
 
 
 if __name__ == '__main__':
