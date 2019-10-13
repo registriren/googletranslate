@@ -87,7 +87,7 @@ def main():
                     translate = translator.translate(text=text, dest=lang).text
                 except Exception as e:
                     logger.error("Error: %s.", e)
-                    translate = None
+                    translate = {}
                 len_sym = len(translate)
                 if len_sym != 0:
                     res_len += len_sym
