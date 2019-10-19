@@ -77,7 +77,7 @@ def main():
                 try:
                     lang_detect = translator.detect(text).lang
                 except Exception as e:
-                    logger.error("Error: %s.", e)
+                    logger.error("Error detect lang: %s.", e)
                     lang_detect = 'en'
                 if lang_detect == 'ru':
                     lang = 'en'
@@ -86,7 +86,7 @@ def main():
                 try:
                     translate = translator.translate(text=text, dest=lang).text
                 except Exception as e:
-                    logger.error("Error: %s.", e)
+                    logger.error("Error translate: %s.", e)
                     translate = {}
                 len_sym = len(translate)
                 if len_sym != 0:
