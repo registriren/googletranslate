@@ -13,7 +13,7 @@ config = 'config.json'
 lang_all = {}
 with open(config, 'r', encoding='utf-8') as c:
     conf = json.load(c)
-    token = "LHqNzik5W5Tp_jFdHhHUaUk1ujkO6k49FnY5Tnr4AI8"  # conf['access_token']
+    token = conf['access_token']
     # key = conf['key']
 
 bot = BotHandler(token)
