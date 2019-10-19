@@ -36,7 +36,6 @@ def main():
         for last_update in list(updates):  # формируем цикл на случай если updates вернул список из нескольких событий
             type_upd = bot.get_update_type(last_update)
             text = bot.get_text(last_update)
-            #text = clean(text)
             text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', text)
             chat_id = bot.get_chat_id(last_update)
             payload = bot.get_payload(last_update)
@@ -78,7 +77,6 @@ def main():
             else:
                 lang = 'ru'
             if text is not None:
-                print('text -', text)
                 try:
                     lang_detect = translator.detect(text).lang
                 except Exception as e:
