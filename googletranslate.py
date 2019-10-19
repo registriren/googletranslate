@@ -2,18 +2,19 @@ from botapitamtam import BotHandler
 import urllib
 import json
 import logging
+import re
 from googletrans import Translator
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 config = 'config.json'
-#base_url = 'https://translate.yandex.net/api/v1.5/tr.json/'
+# base_url = 'https://translate.yandex.net/api/v1.5/tr.json/'
 lang_all = {}
 with open(config, 'r', encoding='utf-8') as c:
     conf = json.load(c)
-    token = conf['access_token']
-    #key = conf['key']
+    token = "LHqNzik5W5Tp_jFdHhHUaUk1ujkO6k49FnY5Tnr4AI8"  # conf['access_token']
+    # key = conf['key']
 
 bot = BotHandler(token)
 translator = Translator()
@@ -35,6 +36,8 @@ def main():
         for last_update in list(updates):  # формируем цикл на случай если updates вернул список из нескольких событий
             type_upd = bot.get_update_type(last_update)
             text = bot.get_text(last_update)
+            #text = clean(text)
+            text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', text)
             chat_id = bot.get_chat_id(last_update)
             payload = bot.get_payload(last_update)
             if text == '/lang':
@@ -44,7 +47,8 @@ def main():
                             {"type": 'callback',
                              "text": 'English',
                              "payload": 'en'}]]
-                bot.send_buttons('Направление перевода\nTranslation direction', buttons, chat_id)  # вызываем две кнопки с одним описанием
+                bot.send_buttons('Направление перевода\nTranslation direction', buttons,
+                                 chat_id)  # вызываем две кнопки с одним описанием
                 text = None
             if text == '/lang ru':
                 lang_all.update({chat_id: 'ru'})
@@ -74,6 +78,7 @@ def main():
             else:
                 lang = 'ru'
             if text is not None:
+                print('text -', text)
                 try:
                     lang_detect = translator.detect(text).lang
                 except Exception as e:
@@ -91,7 +96,9 @@ def main():
                 len_sym = len(translate)
                 if len_sym != 0:
                     res_len += len_sym
-                    logger.info('chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym, res_len))
+                    logger.info(
+                        'chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym,
+                                                                                   res_len))
                     bot.send_message(translate, chat_id)
                 else:
                     bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
