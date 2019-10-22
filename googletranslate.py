@@ -35,8 +35,12 @@ def main():
         updates = update['updates']
         for last_update in list(updates):  # формируем цикл на случай если updates вернул список из нескольких событий
             type_upd = bot.get_update_type(last_update)
-            text = bot.get_text(last_update)
-            text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', text)
+            txt = bot.get_text(last_update)
+            try:
+                text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', txt)
+            except Exception as e:
+                logger.error("Error text correct: %s.", e)
+                text = txt
             chat_id = bot.get_chat_id(last_update)
             payload = bot.get_payload(last_update)
             if text == '/lang':
