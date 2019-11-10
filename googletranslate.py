@@ -43,6 +43,8 @@ def main():
                 text = txt
             chat_id = bot.get_chat_id(last_update)
             payload = bot.get_payload(last_update)
+            callback_id = bot.get_callback_id(last_update)
+            mid = bot.get_message_id(last_update)
             if text == '/lang':
                 buttons = [[{"type": 'callback',
                              "text": 'Русский',
@@ -66,9 +68,13 @@ def main():
                 lang = lang_all.get(chat_id)
                 text = None
                 if lang == 'ru':
-                    bot.send_message('______\nТекст будет переводиться на Русский', chat_id)
+                    #bot.send_message('______\nТекст будет переводиться на Русский', chat_id)
+                    bot.send_answer_callback(callback_id, 'Текст будет переводиться на Русский')
+                    bot.delete_message(mid)
                 else:
-                    bot.send_message('______\nText will be translated into English', chat_id)
+                    #bot.send_message('______\nText will be translated into English', chat_id)
+                    bot.send_answer_callback(callback_id, 'Text will be translated into English')
+                    bot.delete_message(mid)
             if type_upd == 'bot_started':
                 bot.send_message(
                     'Отправьте или перешлите боту текст. Язык переводимого текста определяется автоматически. '
