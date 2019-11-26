@@ -6,6 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/../botapitamtam/.idea/botapitamtam.iml" filepath="$PROJECT_DIR$/../botapitamtam/.idea/botapitamtam.iml" />
       <module fileurl="file://$PROJECT_DIR$/../filelink/.idea/filelink.iml" filepath="$PROJECT_DIR$/../filelink/.idea/filelink.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/googletranslate.iml" filepath="$PROJECT_DIR$/.idea/googletranslate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../instabot/.idea/instabot.iml" filepath="$PROJECT_DIR$/../instabot/.idea/instabot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../instaspy/.idea/instaspy.iml" filepath="$PROJECT_DIR$/../instaspy/.idea/instaspy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../.idea/python.iml" filepath="$PROJECT_DIR$/../.idea/python.iml" />
       <module fileurl="file://$PROJECT_DIR$/../yatranslate/.idea/yatranslate.iml" filepath="$PROJECT_DIR$/../yatranslate/.idea/yatranslate.iml" />
     </modules>
   </component>
