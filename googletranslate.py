@@ -24,16 +24,34 @@ def url_encode(txt):
     return urllib.parse.quote(txt)
 
 
+def translate(text, lang):
+    if lang == 'auto':
+        lang_res = 'ru'
+    else:
+        lang_res = lang
+    try:
+        lang_detect = translator.detect(text).lang
+    except Exception as e:
+        logger.error("Error detect lang: %s.", e)
+        lang_detect = 'en'
+    if lang == 'auto' and lang_detect == 'ru':
+        lang_res = 'en'
+    if lang == 'auto' and lang_detect == 'en':
+        lang_res = 'ru'
+    if lang_res != lang_detect:
+        try:
+            translate = translator.translate(text=text, dest=lang_res).text
+        except Exception as e:
+            logger.error("Error translate: %s.", e)
+            translate = {}
+    return translate, lang_detect
+
+
 def main():
     res_len = 0
-    marker = None
     while True:
-        update = bot.get_updates(marker)
-        if update is None:  # проверка на пустое событие, если пусто - возврат к началу цикла
-            continue
-        marker = bot.get_marker(update)
-        updates = update['updates']
-        for last_update in list(updates):  # формируем цикл на случай если updates вернул список из нескольких событий
+        last_update = bot.get_updates()
+        if last_update:  # формируем цикл на случай если updates вернул список из нескольких событий
             type_upd = bot.get_update_type(last_update)
             txt = bot.get_text(last_update)
             try:
@@ -47,13 +65,16 @@ def main():
             mid = bot.get_message_id(last_update)
             if text == '/lang':
                 buttons = [[{"type": 'callback',
+                             "text": 'Авто|Auto',
+                             "payload": 'auto'},
+                            {"type": 'callback',
                              "text": 'Русский',
                              "payload": 'ru'},
                             {"type": 'callback',
                              "text": 'English',
                              "payload": 'en'}]]
                 bot.send_buttons('Направление перевода\nTranslation direction', buttons,
-                                 chat_id)  # вызываем две кнопки с одним описанием
+                                 chat_id)  # вызываем три кнопки с одним описанием
                 text = None
             if text == '/lang ru':
                 lang_all.update({chat_id: 'ru'})
@@ -63,16 +84,24 @@ def main():
                 lang_all.update({chat_id: 'en'})
                 bot.send_message('Text will be translated into English', chat_id)
                 text = None
+            if text == '/lang auto':
+                lang_all.update({chat_id: 'auto'})
+                bot.send_message('Русский|English - автоматически|automatically', chat_id)
+                text = None
             if payload is not None:
                 lang_all.update({chat_id: payload})
                 lang = lang_all.get(chat_id)
                 text = None
                 if lang == 'ru':
-                    #bot.send_message('______\nТекст будет переводиться на Русский', chat_id)
+                    # bot.send_message('______\nТекст будет переводиться на Русский', chat_id)
                     bot.send_answer_callback(callback_id, 'Текст будет переводиться на Русский')
                     bot.delete_message(mid)
+                elif lang == 'auto':
+                    # bot.send_message('______\nРусский|English - автоматически|automatically', chat_id)
+                    bot.send_answer_callback(callback_id, 'Русский|English - автоматически|automatically')
+                    bot.delete_message(mid)
                 else:
-                    #bot.send_message('______\nText will be translated into English', chat_id)
+                    # bot.send_message('______\nText will be translated into English', chat_id)
                     bot.send_answer_callback(callback_id, 'Text will be translated into English')
                     bot.delete_message(mid)
             if type_upd == 'bot_started':
@@ -85,31 +114,28 @@ def main():
             if chat_id in lang_all.keys():
                 lang = lang_all.get(chat_id)
             else:
-                lang = 'ru'
-            if text is not None:
-                try:
-                    lang_detect = translator.detect(text).lang
-                except Exception as e:
-                    logger.error("Error detect lang: %s.", e)
-                    lang_detect = 'en'
-                if lang_detect == 'ru':
-                    lang = 'en'
-                if lang_detect == 'en':
-                    lang = 'ru'
-                try:
-                    translate = translator.translate(text=text, dest=lang).text
-                except Exception as e:
-                    logger.error("Error translate: %s.", e)
-                    translate = {}
-                len_sym = len(translate)
+                lang = 'auto'
+            if type_upd == 'message_construction_request':
+                text_const = bot.get_construct_text(last_update)
+                sid = bot.get_session_id(last_update)
+                if text_const:
+                    translt, lang_detect = translate(text_const, lang)
+                    bot.send_construct_message(sid, hint=None, text=translt)
+                else:
+                    bot.send_construct_message(sid, 'Введите текст для перевода и отправки в чат | '
+                                                    'Enter the text to be translated and send to the chat')
+            elif text:
+                translt, lang_detect = translate(text, lang)
+                len_sym = len(translt)
                 if len_sym != 0:
                     res_len += len_sym
                     logger.info(
                         'chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym,
                                                                                    res_len))
-                    bot.send_message(translate, chat_id)
+                    bot.send_message(translt, chat_id)
                 else:
                     bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
+        continue
 
 
 if __name__ == '__main__':
