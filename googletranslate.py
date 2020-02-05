@@ -25,6 +25,7 @@ def url_encode(txt):
 
 
 def translate(text, lang):
+    translate_res = None
     if lang == 'auto':
         lang_res = 'ru'
     else:
@@ -40,11 +41,10 @@ def translate(text, lang):
         lang_res = 'ru'
     if lang_res != lang_detect:
         try:
-            translate = translator.translate(text=text, dest=lang_res).text
+            translate_res = translator.translate(text=text, dest=lang_res).text
         except Exception as e:
             logger.error("Error translate: %s.", e)
-            translate = {}
-    return translate, lang_detect
+    return translate_res, lang_detect
 
 
 def main():
@@ -52,6 +52,7 @@ def main():
     while True:
         last_update = bot.get_updates()
         if last_update:  # формируем цикл на случай если updates вернул список из нескольких событий
+            print(last_update)
             type_upd = bot.get_update_type(last_update)
             txt = bot.get_text(last_update)
             try:
@@ -63,7 +64,7 @@ def main():
             payload = bot.get_payload(last_update)
             callback_id = bot.get_callback_id(last_update)
             mid = bot.get_message_id(last_update)
-            if text == '/lang':
+            if text == '/lang' or text == '@gotranslatebot /lang':
                 buttons = [[{"type": 'callback',
                              "text": 'Авто|Auto',
                              "payload": 'auto'},
@@ -113,28 +114,40 @@ def main():
                 text = None
             if chat_id in lang_all.keys():
                 lang = lang_all.get(chat_id)
+            elif '-' in str(chat_id):
+                lang = 'ru'
             else:
                 lang = 'auto'
             if type_upd == 'message_construction_request':
                 text_const = bot.get_construct_text(last_update)
                 sid = bot.get_session_id(last_update)
                 if text_const:
-                    translt, lang_detect = translate(text_const, lang)
-                    bot.send_construct_message(sid, hint=None, text=translt)
+                    translt, lang_detect = translate(text_const, 'auto')
+                    print(lang_detect)
+                    if translt:
+                        bot.send_construct_message(sid, hint=None, text=translt)
+                        text = None
+                    else:
+                        bot.send_construct_message(sid, 'Введите текст для перевода и отправки в чат | '
+                                                        'Enter the text to be translated and send to the chat')
                 else:
                     bot.send_construct_message(sid, 'Введите текст для перевода и отправки в чат | '
                                                     'Enter the text to be translated and send to the chat')
             elif text:
                 translt, lang_detect = translate(text, lang)
-                len_sym = len(translt)
-                if len_sym != 0:
-                    res_len += len_sym
-                    logger.info(
-                        'chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym,
-                                                                                   res_len))
-                    bot.send_message(translt, chat_id)
-                else:
-                    bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
+                if translt:
+                    len_sym = len(translt)
+                    if len_sym != 0:
+                        res_len += len_sym
+                        logger.info(
+                            'chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym,
+                                                                                       res_len))
+                        if '-' in str(chat_id):
+                            bot.send_reply_message(translt, mid, chat_id)
+                        else:
+                            bot.send_message(translt, chat_id)
+                    else:
+                        bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
         continue
 
 
