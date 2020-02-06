@@ -123,10 +123,8 @@ def main():
                 sid = bot.get_session_id(last_update)
                 if text_const:
                     translt, lang_detect = translate(text_const, 'auto')
-                    print(lang_detect)
                     if translt:
                         bot.send_construct_message(sid, hint=None, text=translt)
-                        text = None
                     else:
                         bot.send_construct_message(sid, 'Введите текст для перевода и отправки в чат | '
                                                         'Enter the text to be translated and send to the chat')
