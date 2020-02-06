@@ -52,7 +52,6 @@ def main():
     while True:
         last_update = bot.get_updates()
         if last_update:  # формируем цикл на случай если updates вернул список из нескольких событий
-            print(last_update)
             type_upd = bot.get_update_type(last_update)
             txt = bot.get_text(last_update)
             try:
@@ -94,15 +93,12 @@ def main():
                 lang = lang_all.get(chat_id)
                 text = None
                 if lang == 'ru':
-                    # bot.send_message('______\nТекст будет переводиться на Русский', chat_id)
                     bot.send_answer_callback(callback_id, 'Текст будет переводиться на Русский')
                     bot.delete_message(mid)
                 elif lang == 'auto':
-                    # bot.send_message('______\nРусский|English - автоматически|automatically', chat_id)
                     bot.send_answer_callback(callback_id, 'Русский|English - автоматически|automatically')
                     bot.delete_message(mid)
                 else:
-                    # bot.send_message('______\nText will be translated into English', chat_id)
                     bot.send_answer_callback(callback_id, 'Text will be translated into English')
                     bot.delete_message(mid)
             if type_upd == 'bot_started':
