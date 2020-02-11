@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/_venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (googletranslate)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (_venv) (3)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="apitestbot" />
     <orderEntry type="module" module-name="botapitamtam" />
