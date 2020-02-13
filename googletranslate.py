@@ -125,6 +125,7 @@ def main():
                     translt, lang_detect = translate(text_const, 'en')
                     if translt:
                         bot.send_construct_message(sid, hint=None, text=translt)
+                        logger.info('use constructor in chat_id: {}, lang: {}'.format(chat_id, lang_detect))
                     else:
                         bot.send_construct_message(sid, 'Введите текст для перевода на Английский и отправки в чат | '
                                                         'Enter the text to be translated into English and sent to chat')
