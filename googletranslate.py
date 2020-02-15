@@ -153,8 +153,12 @@ def main():
                 text = None
             if chat_id:
                 lang = get_lang(chat_id)
-            elif '-' in str(chat_id):
-                lang = 'ru'
+                if not lang and '-' in str(chat_id):
+                    lang = 'ru'
+                    set_lang('ru', chat_id)
+                elif not lang:
+                    lang = 'auto'
+                    set_lang('auto', chat_id)
             else:
                 lang = 'auto'
             if type_upd == 'message_construction_request':
