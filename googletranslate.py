@@ -86,6 +86,19 @@ def translate(text, lang):
     return translate_res, lang_detect
 
 
+def symbol_control(TXT):
+    res = True
+    TXT = re.sub("(?P<url>https?://[^\s]+)", '', TXT)
+    TXT = re.sub('(\r|\n)', '', TXT)
+    TXT = re.sub('[^A-Za-zА-Яа-я ]', '', TXT)
+    TXT = re.sub('^ ', '', TXT)
+    TXT = re.sub(' +', ' ', TXT)
+    TXT = re.sub(' *$', '', TXT)
+    if len(TXT) < 2:
+        res = False
+    return res
+
+
 def main():
     res_len = 0
     while True:
@@ -104,6 +117,7 @@ def main():
             mid = bot.get_message_id(last_update)
             name = bot.get_name(last_update)
             admins = bot.get_chat_admins(chat_id)
+            att_type = bot.get_attach_type(last_update)
             if not admins or admins and name in [i['name'] for i in admins['members']]:
                 if text == '/lang' or text == '@gotranslatebot /lang':
                     buttons = [[{"type": 'callback',
@@ -177,7 +191,7 @@ def main():
                 else:
                     bot.send_construct_message(sid, 'Введите текст для перевода на Английский и отправки в чат | '
                                                     'Enter the text to be translated into English and send to chat')
-            elif text:
+            elif text and symbol_control(text) and att_type != 'share':
                 translt, lang_detect = translate(text, lang)
                 if translt:
                     len_sym = len(translt)
