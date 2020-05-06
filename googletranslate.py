@@ -107,7 +107,7 @@ def main():
             type_upd = bot.get_update_type(last_update)
             txt = bot.get_text(last_update)
             try:
-                text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', txt)
+                text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
             except Exception as e:
                 logger.error("Error text correct: %s.", e)
                 text = txt
