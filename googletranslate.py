@@ -144,7 +144,7 @@ def main():
                     set_lang('auto', chat_id)
                     bot.send_message('Русский|English - автоматически|automatically', chat_id)
                     text = None
-                if payload is not None:
+                if payload:
                     set_lang(payload, chat_id)
                     lang = get_lang(chat_id)
                     text = None
