@@ -105,58 +105,8 @@ def main():
         last_update = bot.get_updates()
         if last_update:  # формируем цикл на случай если updates вернул список из нескольких событий
             type_upd = bot.get_update_type(last_update)
-            txt = bot.get_text(last_update)
-            try:
-                text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
-            except Exception as e:
-                logger.error("Error text correct: %s.", e)
-                text = txt
             chat_id = bot.get_chat_id(last_update)
-            payload = bot.get_payload(last_update)
-            callback_id = bot.get_callback_id(last_update)
             mid = bot.get_message_id(last_update)
-            name = bot.get_name(last_update)
-            admins = bot.get_chat_admins(chat_id)
-            att_type = bot.get_attach_type(last_update)
-            if not admins or admins and name in [i['name'] for i in admins['members']]:
-                if text == '/lang' or text == '@gotranslatebot /lang':
-                    buttons = [[{"type": 'callback',
-                                 "text": 'Авто|Auto',
-                                 "payload": 'auto'},
-                                {"type": 'callback',
-                                 "text": 'Русский',
-                                 "payload": 'ru'},
-                                {"type": 'callback',
-                                 "text": 'English',
-                                 "payload": 'en'}]]
-                    bot.send_buttons('Направление перевода\nTranslation direction', buttons,
-                                     chat_id)  # вызываем три кнопки с одним описанием
-                    text = None
-                if text == '/lang ru' or text == '@gotranslatebot /lang ru':
-                    set_lang('ru', chat_id)
-                    bot.send_message('Текст будет переводиться на Русский', chat_id)
-                    text = None
-                if text == '/lang en' or text == '@gotranslatebot /lang en':
-                    set_lang('en', chat_id)
-                    bot.send_message('Text will be translated into English', chat_id)
-                    text = None
-                if text == '/lang auto' or text == '@gotranslatebot /lang auto':
-                    set_lang('auto', chat_id)
-                    bot.send_message('Русский|English - автоматически|automatically', chat_id)
-                    text = None
-                if payload:
-                    set_lang(payload, chat_id)
-                    lang = get_lang(chat_id)
-                    text = None
-                    if lang == 'ru':
-                        bot.send_answer_callback(callback_id, 'Текст будет переводиться на Русский')
-                        bot.delete_message(mid)
-                    elif lang == 'auto':
-                        bot.send_answer_callback(callback_id, 'Русский|English - автоматически|automatically')
-                        bot.delete_message(mid)
-                    else:
-                        bot.send_answer_callback(callback_id, 'Text will be translated into English')
-                        bot.delete_message(mid)
 
             if type_upd == 'bot_started':
                 bot.send_message(
@@ -166,7 +116,6 @@ def main():
                     'default translation into Russian. To change the translation direction, use the command /lang',
                     chat_id)
                 set_lang('ru', chat_id)
-                text = None
             if chat_id:
                 lang = get_lang(chat_id)
                 if not lang and '-' in str(chat_id):
@@ -191,21 +140,77 @@ def main():
                 else:
                     bot.send_construct_message(sid, 'Введите текст для перевода на Английский и отправки в чат | '
                                                     'Enter the text to be translated into English and send to chat')
-            elif text and symbol_control(text) and att_type != 'share':
-                translt, lang_detect = translate(text, lang)
-                if translt:
-                    len_sym = len(translt)
-                    if len_sym != 0:
-                        res_len += len_sym
-                        logger.info(
-                            'chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect, len_sym,
-                                                                                       res_len))
-                        if '-' in str(chat_id):
-                            bot.send_reply_message(translt, mid, chat_id)
-                        else:
-                            bot.send_message(translt, chat_id)
+            if type_upd == 'message_callback':
+                payload = bot.get_payload(last_update)
+                callback_id = bot.get_callback_id(last_update)
+
+                if payload:
+                    set_lang(payload, chat_id)
+                    lang = get_lang(chat_id)
+                    # text = None
+                    if lang == 'ru':
+                        bot.send_answer_callback(callback_id, 'Текст будет переводиться на Русский')
+                        bot.delete_message(mid)
+                    elif lang == 'auto':
+                        bot.send_answer_callback(callback_id, 'Русский|English - автоматически|automatically')
+                        bot.delete_message(mid)
                     else:
-                        bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
+                        bot.send_answer_callback(callback_id, 'Text will be translated into English')
+                        bot.delete_message(mid)
+
+            if type_upd == 'message_created':
+                name = bot.get_name(last_update)
+                admins = bot.get_chat_admins(chat_id)
+                txt = bot.get_text(last_update)
+                try:
+                    text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
+                except Exception as e:
+                    logger.error("Error text correct: %s.", e)
+                    text = txt
+                if not admins or admins and name in [i['name'] for i in admins['members']]:
+                    if text == '/lang' or text == '@gotranslatebot /lang':
+                        buttons = [[{"type": 'callback',
+                                     "text": 'Авто|Auto',
+                                     "payload": 'auto'},
+                                    {"type": 'callback',
+                                     "text": 'Русский',
+                                     "payload": 'ru'},
+                                    {"type": 'callback',
+                                     "text": 'English',
+                                     "payload": 'en'}]]
+                        bot.send_buttons('Направление перевода\nTranslation direction', buttons,
+                                         chat_id)  # вызываем три кнопки с одним описанием
+                        text = None
+                    if text == '/lang ru' or text == '@gotranslatebot /lang ru':
+                        set_lang('ru', chat_id)
+                        bot.send_message('Текст будет переводиться на Русский', chat_id)
+                        text = None
+                    if text == '/lang en' or text == '@gotranslatebot /lang en':
+                        set_lang('en', chat_id)
+                        bot.send_message('Text will be translated into English', chat_id)
+                        text = None
+                    if text == '/lang auto' or text == '@gotranslatebot /lang auto':
+                        set_lang('auto', chat_id)
+                        bot.send_message('Русский|English - автоматически|automatically', chat_id)
+                        text = None
+
+                    att_type = bot.get_attach_type(last_update)
+                    if text and symbol_control(text) and att_type != 'share' and type_upd != 'message_constructed':
+                        translt, lang_detect = translate(text, lang)
+                        if translt:
+                            len_sym = len(translt)
+                            if len_sym != 0:
+                                res_len += len_sym
+                                logger.info(
+                                    'chat_id: {}, lang: {}, len symbols: {}, result {}'.format(chat_id, lang_detect,
+                                                                                               len_sym,
+                                                                                               res_len))
+                                if '-' in str(chat_id):
+                                    bot.send_reply_message(translt, mid, chat_id)
+                                else:
+                                    bot.send_message(translt, chat_id)
+                            else:
+                                bot.send_message('Перевод невозможен\nTranslation not available', chat_id)
 
 
 if __name__ == '__main__':
