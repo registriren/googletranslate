@@ -164,6 +164,7 @@ def main():
                 txt = bot.get_text(last_update)
                 try:
                     text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
+                    text = re.sub("(?P<url>https?://[^\s]+)", '', text)
                 except Exception as e:
                     logger.error("Error text correct: %s.", e)
                     text = txt
@@ -195,7 +196,7 @@ def main():
                         text = None
 
                     att_type = bot.get_attach_type(last_update)
-                    if text and symbol_control(text) and att_type != 'share' and type_upd != 'message_constructed':
+                    if text  and att_type != 'share' and type_upd != 'message_constructed':  # and symbol_control(text)
                         translt, lang_detect = translate(text, lang)
                         if translt:
                             len_sym = len(translt)

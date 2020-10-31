@@ -10,8 +10,6 @@
     <orderEntry type="module" module-name="botapitamtam" />
     <orderEntry type="module" module-name="translatebot" />
     <orderEntry type="module" module-name="filelink" />
-    <orderEntry type="module" module-name="python" />
-    <orderEntry type="module" module-name="instabot" />
     <orderEntry type="module" module-name="instaspy" />
   </component>
 </module>
