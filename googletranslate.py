@@ -5,7 +5,11 @@ import urllib
 import json
 import logging
 import re
-from googletrans import Translator
+#from googletrans import Translator
+import translators as ts
+#from langdetect import detect
+#import langid
+from textblob import TextBlob
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -19,7 +23,7 @@ with open(config, 'r', encoding='utf-8') as c:
     # key = conf['key']
 
 bot = BotHandler(token)
-translator = Translator()
+#translator = Translator()
 
 if not os.path.isfile('users.db'):
     conn = sqlite3.connect("users.db")
@@ -70,7 +74,11 @@ def translate(text, lang):
     else:
         lang_res = lang
     try:
-        lang_detect = translator.detect(text).lang
+        #lang_detect = detect(text)
+        lang_detect = TextBlob(text).detect_language()
+        #print(lang_detect)
+        #print(langid.classify(text)[0])
+        #print(TextBlob(text).detect_language())
     except Exception as e:
         logger.error("Error detect lang: %s.", e)
         lang_detect = 'en'
@@ -80,7 +88,10 @@ def translate(text, lang):
         lang_res = 'ru'
     if lang_res != lang_detect:
         try:
-            translate_res = translator.translate(text=text, dest=lang_res).text
+            #translate_res = translator.translate(text=text, dest=lang_res).text
+            translate_res = ts.bing(text, from_language='auto', to_language=lang_res)
+            #print(translate_res)
+            #print(TextBlob(text).translate(to=lang_res))
         except Exception as e:
             logger.error("Error translate: %s.", e)
     return translate_res, lang_detect
@@ -161,13 +172,13 @@ def main():
             if type_upd == 'message_created':
                 name = bot.get_name(last_update)
                 admins = bot.get_chat_admins(chat_id)
-                txt = bot.get_text(last_update)
-                try:
-                    text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
-                    text = re.sub("(?P<url>https?://[^\s]+)", '', text)
-                except Exception as e:
-                    logger.error("Error text correct: %s.", e)
-                    text = txt
+                text = bot.get_text(last_update)
+                #try:
+                    #text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
+                    #text = re.sub("(?P<url>https?://[^\s]+)", '', text)
+                #except Exception as e:
+                #    logger.error("Error text correct: %s.", e)
+                #    text = txt
                 if not admins or admins and name in [i['name'] for i in admins['members']]:
                     if text == '/lang' or text == '@gotranslatebot /lang':
                         buttons = [[{"type": 'callback',
@@ -196,7 +207,7 @@ def main():
                         text = None
 
                     att_type = bot.get_attach_type(last_update)
-                    if text  and att_type != 'share' and type_upd != 'message_constructed':  # and symbol_control(text)
+                    if text and att_type != 'share' and type_upd != 'message_constructed':  # and symbol_control(text)
                         translt, lang_detect = translate(text, lang)
                         if translt:
                             len_sym = len(translt)
