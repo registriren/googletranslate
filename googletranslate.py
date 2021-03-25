@@ -114,10 +114,12 @@ def main():
     res_len = 0
     while True:
         last_update = bot.get_updates()
-        if last_update:  # формируем цикл на случай если updates вернул список из нескольких событий
+        if last_update:
             type_upd = bot.get_update_type(last_update)
             chat_id = bot.get_chat_id(last_update)
             mid = bot.get_message_id(last_update)
+            text = bot.get_text(last_update)
+            print(type_upd)
 
             if type_upd == 'bot_started':
                 bot.send_message(
@@ -138,7 +140,7 @@ def main():
             else:
                 lang = 'auto'
             if type_upd == 'message_construction_request':
-                text_const = bot.get_construct_text(last_update)
+                text_const = text
                 sid = bot.get_session_id(last_update)
                 if text_const:
                     translt, lang_detect = translate(text_const, 'en')
@@ -173,6 +175,7 @@ def main():
                 name = bot.get_name(last_update)
                 admins = bot.get_chat_admins(chat_id)
                 text = bot.get_text(last_update)
+                print(text)
                 #try:
                     #text = re.sub(r'[^\w\s,.?!/:~`@#$%^&*()_+={}№;"><]', '', str(txt))
                     #text = re.sub("(?P<url>https?://[^\s]+)", '', text)
