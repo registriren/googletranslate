@@ -76,11 +76,11 @@ def translate(text, lang):
     else:
         lang_res = lang
     try:
-        print(text)
+        #print(text)
         #lang_detect = translator.detect('next')
         #lang_detect = TextBlob(text).detect_language()
         lang_detect = detect(text)
-        print(lang_detect)
+        #print(lang_detect)
         #print(langid.classify(text)[0])
         #print(TextBlob(text).detect_language())
     except Exception as e:
