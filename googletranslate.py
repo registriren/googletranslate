@@ -124,7 +124,7 @@ def main():
             chat_id = bot.get_chat_id(last_update)
             mid = bot.get_message_id(last_update)
             text = bot.get_text(last_update)
-            #print(type_upd)
+            print(text)
 
             if type_upd == 'bot_started':
                 bot.send_message(
