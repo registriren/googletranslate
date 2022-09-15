@@ -124,8 +124,6 @@ def main():
             chat_id = bot.get_chat_id(last_update)
             mid = bot.get_message_id(last_update)
             text = bot.get_text(last_update)
-            print(text)
-
             if type_upd == 'bot_started':
                 bot.send_message(
                     'Отправьте или перешлите боту текст. Язык переводимого текста определяется автоматически. '
@@ -161,11 +159,9 @@ def main():
             if type_upd == 'message_callback':
                 payload = bot.get_payload(last_update)
                 callback_id = bot.get_callback_id(last_update)
-
                 if payload:
                     set_lang(payload, chat_id)
                     lang = get_lang(chat_id)
-                    # text = None
                     if lang == 'ru':
                         bot.send_answer_callback(callback_id, 'Текст будет переводиться на Русский')
                         bot.delete_message(mid)
@@ -175,7 +171,6 @@ def main():
                     else:
                         bot.send_answer_callback(callback_id, 'Text will be translated into English')
                         bot.delete_message(mid)
-
             if type_upd == 'message_created':
                 name = bot.get_name(last_update)
                 admins = bot.get_chat_admins(chat_id)
@@ -237,4 +232,5 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
+        logger.error('Stop')
         exit()
